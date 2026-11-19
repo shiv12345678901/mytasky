@@ -1,13 +1,13 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { GlassButton, GlassCard, GlassInput, GlassNav, GlassSegmented, GlassSheet, GlassSwitch } from "@zakisheriff/liquid-glass";
-import { CalendarDays, Check, Circle, CloudOff, Download, Focus, ListTodo, Moon, Plus, RefreshCw, Settings, Sparkles, Sun, Trash2, Wifi } from "lucide-react";
+import { GlassButton, GlassCard, GlassInput, GlassSegmented, GlassSheet, GlassSwitch } from "@zakisheriff/liquid-glass";
+import { CalendarDays, Check, Circle, CloudOff, Download, ListTodo, Moon, Plus, RefreshCw, Settings, Sparkles, Sun, Trash2, Wifi } from "lucide-react";
 import type { Task, TaskList, Theme } from "./types";
 import "./App.css";
 
 const STORAGE_KEY = "mytasky-tasks-v1";
 const THEME_KEY = "mytasky-theme";
 const lists: TaskList[] = ["Personal", "Work", "Home"];
-const tabs = ["today", "tasks", "focus", "settings"] as const;
+const tabs = ["today", "tasks", "settings"] as const;
 const todayLabel = new Intl.DateTimeFormat("en-AU", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
 type Tab = (typeof tabs)[number];
 type Filter = "all" | TaskList;
@@ -40,10 +40,10 @@ function loadTheme(): Theme {
 
 function TaskRow({ task, onToggle, onDelete }: { task: Task; onToggle: () => void; onDelete: () => void }) {
   return <li className={`task-row${task.completed ? " is-complete" : ""}`}>
-    <GlassButton className="task-check" variant="clear" size="md" icon={task.completed ? <Check /> : <Circle />} aria-label={`${task.completed ? "Mark incomplete" : "Complete"}: ${task.title}`} onClick={onToggle} />
+    <button className="task-check" type="button" aria-label={`${task.completed ? "Mark incomplete" : "Complete"}: ${task.title}`} onClick={onToggle}>{task.completed ? <Check /> : <Circle />}</button>
     <div className="task-copy"><strong>{task.title}</strong><span>{task.list} · {task.due}</span></div>
     {task.priority === "high" && <span className="priority-label"><span />High</span>}
-    <GlassButton className="task-delete" variant="clear" destructive size="md" icon={<Trash2 />} aria-label={`Delete ${task.title}`} onClick={onDelete} />
+    <button className="task-delete" type="button" aria-label={`Delete ${task.title}`} onClick={onDelete}><Trash2 /></button>
   </li>;
 }
 
@@ -61,13 +61,12 @@ export default function App() {
   const [installed, setInstalled] = useState(() => window.matchMedia("(display-mode: standalone)").matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone));
   const [offlineReady, setOfflineReady] = useState(false);
   const [updateReady, setUpdateReady] = useState(false);
-  const scrollPositions = useRef<Record<Tab, number>>({ today: 0, tasks: 0, focus: 0, settings: 0 });
+  const scrollPositions = useRef<Record<Tab, number>>({ today: 0, tasks: 0, settings: 0 });
 
   const todayTasks = useMemo(() => tasks.filter((task) => task.due === "Today"), [tasks]);
   const visibleToday = filter === "all" ? todayTasks : todayTasks.filter((task) => task.list === filter);
   const completeCount = todayTasks.filter((task) => task.completed).length;
   const progress = todayTasks.length ? Math.round((completeCount / todayTasks.length) * 100) : 0;
-  const nextTask = todayTasks.find((task) => !task.completed);
 
   useEffect(() => localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)), [tasks]);
 
@@ -105,9 +104,8 @@ export default function App() {
 
   useLayoutEffect(() => { window.scrollTo({ top: scrollPositions.current[tab], behavior: "instant" }); }, [tab]);
 
-  function changeTab(index: number) {
-    const nextTab = tabs[index];
-    if (!nextTab || nextTab === tab) return;
+  function changeTab(nextTab: Tab) {
+    if (nextTab === tab) return;
     scrollPositions.current[tab] = window.scrollY;
     setTab(nextTab);
   }
@@ -139,7 +137,7 @@ export default function App() {
       <section className="screen" hidden={tab !== "today"} aria-labelledby="today-title">
         <header className="page-header"><div><span className="eyebrow">{todayLabel}</span><h1 id="today-title">Good morning</h1></div><GlassButton className="add-button" variant="filled" tint="#0a84ff" size="lg" icon={<Plus />} aria-label="Add task" onClick={() => setAddOpen(true)} /></header>
         <GlassCard className="progress-card" intensity={4} thickness={2} tint="rgba(10,132,255,.08)" padding="20px" radius="26px"><div><span>Today</span><strong>{completeCount} of {todayTasks.length}</strong></div><div className="progress-track"><span style={{ width: `${progress}%` }} /></div><p>{progress === 100 ? "Everything is done. Enjoy the space you made." : "A calm list, one clear next step."}</p></GlassCard>
-        <GlassSegmented className="filter-control" options={["All", ...lists]} value={["all", ...lists].indexOf(filter)} onChange={(index) => setFilter((["all", ...lists][index] ?? "all") as Filter)} aria-label="Filter today's tasks" />
+        <div className="filter-control" role="tablist" aria-label="Filter today's tasks">{(["all", ...lists] as Filter[]).map((item) => <button type="button" role="tab" aria-selected={filter === item} className={filter === item ? "active" : ""} onClick={() => setFilter(item)} key={item}>{item === "all" ? "All" : item}</button>)}</div>
         <section className="content-section" aria-labelledby="today-tasks-title"><div className="section-heading"><h2 id="today-tasks-title">Today’s tasks</h2><span>{visibleToday.length}</span></div>{visibleToday.length ? <ul className="task-list">{visibleToday.map((task) => <TaskRow task={task} onToggle={() => toggleTask(task.id)} onDelete={() => deleteTask(task.id)} key={task.id} />)}</ul> : <div className="empty-state"><Check /><h3>You’re clear</h3><p>No tasks match this filter.</p></div>}</section>
       </section>
 
@@ -148,20 +146,20 @@ export default function App() {
         {lists.map((taskList) => <section className="content-section" key={taskList}><div className="section-heading"><h2>{taskList}</h2><span>{tasks.filter((task) => task.list === taskList).length}</span></div>{tasks.some((task) => task.list === taskList) ? <ul className="task-list">{tasks.filter((task) => task.list === taskList).map((task) => <TaskRow task={task} onToggle={() => toggleTask(task.id)} onDelete={() => deleteTask(task.id)} key={task.id} />)}</ul> : <div className="compact-empty">No tasks yet</div>}</section>)}
       </section>
 
-      <section className="screen focus-screen" hidden={tab !== "focus"} aria-labelledby="focus-title"><header className="page-header"><div><span className="eyebrow">One thing at a time</span><h1 id="focus-title">Focus</h1></div></header><GlassCard className="focus-card" intensity={4} thickness={2} tint="rgba(100,210,255,.06)" radius="30px"><span className="focus-icon"><Focus /></span><span className="eyebrow">Up next</span><h2>{nextTask?.title ?? "Nothing left for today"}</h2><p>{nextTask ? `${nextTask.list} · ${nextTask.due}` : "Your Today list is complete."}</p><GlassButton variant="filled" tint="#0a84ff" size="lg" disabled={!nextTask}>{nextTask ? "Start 25 minutes" : "All done"}</GlassButton></GlassCard></section>
-
       <section className="screen" hidden={tab !== "settings"} aria-labelledby="settings-title">
         <header className="page-header"><div><span className="eyebrow">Make it yours</span><h1 id="settings-title">Settings</h1></div></header>
-        <section className="content-section"><div className="section-heading"><h2>Appearance</h2></div><div className="settings-card"><span className="settings-icon purple">{theme === "dark" ? <Moon /> : <Sun />}</span><div><strong>Theme</strong><span>Follow the system or choose a look</span></div><GlassSegmented className="theme-control" options={["System", "Light", "Dark"]} value={["system", "light", "dark"].indexOf(theme)} onChange={(index) => setTheme((["system", "light", "dark"][index] ?? "system") as Theme)} aria-label="Theme" /></div></section>
+        <section className="content-section"><div className="section-heading"><h2>Appearance</h2></div><div className="settings-card"><span className="settings-icon purple">{theme === "dark" ? <Moon /> : <Sun />}</span><div><strong>Theme</strong><span>Follow the system or choose a look</span></div><div className="theme-control" role="group" aria-label="Theme">{(["system", "light", "dark"] as Theme[]).map((option) => <button className={theme === option ? "active" : ""} type="button" aria-pressed={theme === option} onClick={() => setTheme(option)} key={option}>{option}</button>)}</div></div></section>
         <section className="content-section"><div className="section-heading"><h2>App</h2></div><div className="settings-card app-status-card"><span className={`settings-icon ${online ? "blue" : "orange"}`}>{online ? <Wifi /> : <CloudOff />}</span><div><strong>{installed ? "Installed app" : "Offline ready"}</strong><span>{online ? "Tasks stay available without a connection" : "You’re offline — changes are saved on this device"}</span></div>{installPrompt && !installed && <GlassButton className="install-button" variant="tinted-filled" tint="#0a84ff" icon={<Download />} onClick={() => void installApp()}>Install</GlassButton>}</div></section>
-        <section className="content-section"><div className="section-heading"><h2>About</h2></div><div className="about-card"><span className="about-icon"><Sparkles /></span><div><strong>Mytasky</strong><span>Private, local-first and offline · Version 0.2.0</span></div></div></section>
+        <section className="content-section"><div className="section-heading"><h2>About</h2></div><div className="about-card"><span className="about-icon"><Sparkles /></span><div><strong>Mytasky</strong><span>Private, local-first and offline · Version 0.2.1</span></div></div></section>
       </section>
     </main>
 
-    {(offlineReady || updateReady || !online) && <div className="app-notice" role="status"><GlassCard intensity={3} radius="20px" padding="12px 14px"><span>{updateReady ? <RefreshCw /> : online ? <Check /> : <CloudOff />}</span><p>{updateReady ? "A fresh version is ready" : online ? "Mytasky is ready offline" : "Working offline"}</p>{updateReady ? <GlassButton variant="tinted" size="sm" onClick={() => window.dispatchEvent(new Event("mytasky:apply-update"))}>Update</GlassButton> : <button type="button" aria-label="Dismiss" onClick={() => setOfflineReady(false)}>×</button>}</GlassCard></div>}
+    {(offlineReady || !online) && <div className="app-notice" role="status"><GlassCard intensity={3} radius="20px" padding="12px 14px"><span>{online ? <Check /> : <CloudOff />}</span><p>{online ? "Mytasky is ready offline" : "Working offline"}</p><button type="button" aria-label="Dismiss" onClick={() => setOfflineReady(false)}>×</button></GlassCard></div>}
 
-    <GlassNav className="tab-bar" items={[{ label: "Today", icon: <CalendarDays /> }, { label: "Tasks", icon: <ListTodo /> }, { label: "Focus", icon: <Focus /> }, { label: "Settings", icon: <Settings /> }]} activeIndex={tabs.indexOf(tab)} onChange={changeTab} intensity={6} aria-label="Primary navigation" />
+    <nav className="tab-bar" aria-label="Primary navigation">{([{ id: "today", label: "Today", Icon: CalendarDays }, { id: "tasks", label: "Tasks", Icon: ListTodo }, { id: "settings", label: "Settings", Icon: Settings }] as const).map(({ id, label, Icon }) => <button type="button" className={tab === id ? "active" : ""} aria-current={tab === id ? "page" : undefined} onClick={() => changeTab(id)} key={id}><Icon /><span>{label}</span></button>)}</nav>
 
     <GlassSheet open={addOpen} onClose={() => setAddOpen(false)} intensity={5} aria-label="Add task"><form className="add-task-form" onSubmit={addTask}><header><GlassButton variant="clear" type="button" onClick={() => setAddOpen(false)}>Cancel</GlassButton><h2>New Task</h2><GlassButton className="save-task" variant="tinted" type="submit" disabled={!title.trim()}>Add</GlassButton></header><GlassInput autoFocus label="Task" value={title} onChange={(event) => setTitle(event.target.value)} onClear={() => setTitle("")} placeholder="What needs doing?" maxLength={100} /><fieldset><legend>List</legend><GlassSegmented options={lists} value={lists.indexOf(list)} onChange={(index) => setList(lists[index] ?? "Personal")} aria-label="Task list" /></fieldset><div className="priority-toggle"><span><strong>High priority</strong><small>Make this task stand out</small></span><GlassSwitch checked={priority === "high"} onChange={(checked) => setPriority(checked ? "high" : "normal")} tint="#ff9f0a" aria-label="High priority" /></div></form></GlassSheet>
+
+    <GlassSheet open={updateReady && !addOpen} onClose={() => setUpdateReady(false)} intensity={5} aria-label="App update available"><section className="update-sheet"><span className="update-icon"><RefreshCw /></span><h2>Update Mytasky?</h2><p>A fresh version is ready. Your tasks are stored safely on this device.</p><div><GlassButton variant="clear" onClick={() => setUpdateReady(false)}>Later</GlassButton><GlassButton variant="filled" tint="#0a84ff" onClick={() => window.dispatchEvent(new Event("mytasky:apply-update"))}>Update now</GlassButton></div></section></GlassSheet>
   </div>;
 }

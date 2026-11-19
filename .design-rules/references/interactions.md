@@ -3,6 +3,7 @@
 ## Navigation
 
 - Primary tabs switch stable top-level destinations without rebuilding shared data.
+- Primary tabs use direct button selection; do not use draggable lenses or gesture-based selection for essential navigation.
 - A detail view returns to its direct parent and restores that parent’s exact scroll position before it becomes visible.
 - Do not make a global swipe gesture behave like browser history across every page.
 

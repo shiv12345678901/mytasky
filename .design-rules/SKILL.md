@@ -22,7 +22,7 @@ Mytasky should reduce task anxiety. Present a calm list, one obvious next step, 
 
 ## Non-negotiable rules
 
-- Use `@zakisheriff/liquid-glass` for floating navigation, controls, ambient progress/focus panels, and bottom sheets. Keep dense task lists and settings rows opaque for legibility and scroll performance.
+- Use `@zakisheriff/liquid-glass` selectively for sheets, ambient progress panels, and high-value controls. Keep primary navigation deterministic and keep dense task lists, routine filters, and settings rows opaque for legibility, reliability, and scroll performance.
 - Interactive controls have at least a 44×44 CSS-pixel target.
 - Use semantic colors and never communicate status with color alone.
 - Keep primary tabs stable; detail screens return to their direct parent, not an unrelated history entry.

@@ -13,6 +13,12 @@ createRoot(document.getElementById('root')!).render(
 
 const updateServiceWorker = registerSW({
   immediate: true,
+  onRegisteredSW: (_serviceWorkerUrl, registration) => {
+    if (!registration) return
+    const checkForUpdate = () => { if (document.visibilityState === 'visible') void registration.update() }
+    window.addEventListener('visibilitychange', checkForUpdate)
+    window.setInterval(checkForUpdate, 60 * 60 * 1000)
+  },
   onOfflineReady: () => window.dispatchEvent(new Event('mytasky:offline-ready')),
   onNeedRefresh: () => window.dispatchEvent(new Event('mytasky:update-ready')),
 })

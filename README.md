@@ -4,7 +4,7 @@ Mytasky is a public, installable offline-first task app with a calm, native-feel
 
 ## What is included
 
-- Today, Tasks, Focus, and Settings views
+- Today, Tasks, and Settings views
 - Add, complete, filter, and delete task flows
 - Persistent local storage and light, dark, or system appearance
 - A generated service worker, install manifest, app icons, offline cache, and update prompt
@@ -32,7 +32,7 @@ git diff --check
 
 ## Design direction
 
-Mytasky reduces task anxiety through quiet hierarchy, opaque content surfaces, one obvious primary action, and short purposeful motion. Blur is reserved for the floating tab bar. The design documentation is intentionally stored with the code so future contributors and coding agents use the same decisions.
+Mytasky reduces task anxiety through quiet hierarchy, opaque content surfaces, one obvious primary action, and short purposeful motion. Translucency is reserved for spatial overlays such as the floating tab bar and sheets. The design documentation is intentionally stored with the code so future contributors and coding agents use the same decisions.
 
 ## Next product decisions
 

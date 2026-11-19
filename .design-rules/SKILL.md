@@ -22,11 +22,11 @@ Mytasky should reduce task anxiety. Present a calm list, one obvious next step, 
 
 ## Non-negotiable rules
 
-- Use opaque content surfaces. Blur or translucency belongs only on a floating navigation layer.
+- Use `@zakisheriff/liquid-glass` for floating navigation, controls, ambient progress/focus panels, and bottom sheets. Keep dense task lists and settings rows opaque for legibility and scroll performance.
 - Interactive controls have at least a 44×44 CSS-pixel target.
 - Use semantic colors and never communicate status with color alone.
 - Keep primary tabs stable; detail screens return to their direct parent, not an unrelated history entry.
-- Use bottom sheets for focused creation and confirmation. Give them rounded top corners, a grabber, gesture dismissal, and an explicit close action.
+- Use `GlassSheet` for focused creation and confirmation. Preserve gesture dismissal and an explicit close action.
 - Preserve scroll position without a flash, jump, or delayed restoration.
 - Keep motion brief and purposeful, and respect `prefers-reduced-motion`.
 - Give each screen one clear primary action and use verb-led labels.

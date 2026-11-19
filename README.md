@@ -1,13 +1,15 @@
 # Mytasky
 
-Mytasky is a public, local-first task app starter with a calm, native-feeling iOS interface. It includes the design rules and review practices needed to extend the product without losing visual or interaction consistency.
+Mytasky is a public, installable offline-first task app with a calm, native-feeling iOS interface. It includes the design rules and review practices needed to extend the product without losing visual or interaction consistency.
 
 ## What is included
 
 - Today, Tasks, Focus, and Settings views
 - Add, complete, filter, and delete task flows
 - Persistent local storage and light, dark, or system appearance
-- An opaque iOS-style bottom sheet with drag and explicit dismissal
+- A generated service worker, install manifest, app icons, offline cache, and update prompt
+- Apple-style refracting controls from `@zakisheriff/liquid-glass`
+- A gesture-dismissible Liquid Glass task sheet
 - Safe-area-aware layouts, accessible labels, keyboard focus, and reduced-motion support
 - A reusable product-design skill in [`.design-rules/SKILL.md`](.design-rules/SKILL.md)
 
@@ -34,7 +36,7 @@ Mytasky reduces task anxiety through quiet hierarchy, opaque content surfaces, o
 
 ## Next product decisions
 
-The starter deliberately avoids selecting a backend or authentication provider. Natural next steps are task editing, reminders, recurring tasks, cloud sync, and shared lists. Add these only after defining their loading, empty, error, offline, and retry states.
+The app deliberately avoids selecting a backend or authentication provider. Tasks remain private on the device and continue working offline. Natural next steps are task editing, reminders, recurring tasks, optional cloud sync, and shared lists. Add these only after defining their loading, empty, error, offline, and retry states.
 
 ## License
 

@@ -10,5 +10,6 @@
 - [ ] Loading, success, error, offline, and retry behavior are intentional.
 - [ ] Returning navigation restores the correct parent and scroll position without flashing.
 - [ ] Animation is stable, brief, and removed appropriately for reduced motion.
-- [ ] Sheets use opaque surfaces and provide gesture plus explicit dismissal.
+- [ ] Glass is limited to appropriate spatial layers and always has meaningful content behind it.
+- [ ] Sheets provide gesture plus explicit dismissal.
 - [ ] Tests and verification commands pass.

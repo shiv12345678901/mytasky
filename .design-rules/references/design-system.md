@@ -10,8 +10,9 @@
 ## Surfaces
 
 - Page background, grouped content surface, and raised control are separate semantic tokens.
-- Content cards are opaque and have restrained borders and shadows.
-- Use translucency only when spatial layering matters, such as the floating tab bar.
+- Dense content cards are opaque and have restrained borders and shadows.
+- Use the shared Liquid Glass components where spatial layering matters: navigation, controls, sheets, and a small number of ambient hero panels.
+- Glass always sits over a gradient, image, or scrolling content that it can optically refract.
 - Maintain readable contrast in both themes; do not use opacity alone for essential text.
 
 ## Type and spacing

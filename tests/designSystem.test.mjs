@@ -1,27 +1,35 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("primary navigation exposes four stable destinations", async () => {
+test("primary navigation uses the shared Liquid Glass tab bar", async () => {
   const app = await read("src/App.tsx");
-  for (const label of ["Today", "Tasks", "Focus", "Settings"]) assert.match(app, new RegExp(`"${label}"`));
-  assert.match(app, /className="tab-bar"/);
+  for (const label of ["Today", "Tasks", "Focus", "Settings"]) assert.match(app, new RegExp(`label: "${label}"`));
+  assert.match(app, /<GlassNav/);
 });
 
-test("core task interactions remain implemented", async () => {
+test("core task interactions remain local-first", async () => {
   const app = await read("src/App.tsx");
   for (const action of ["addTask", "toggleTask", "deleteTask", "setFilter"]) assert.match(app, new RegExp(action));
   assert.match(app, /localStorage/);
 });
 
-test("sheet is accessible, draggable, and opaque", async () => {
-  const [sheet, css] = await Promise.all([read("src/components/IosSheet.tsx"), read("src/App.css")]);
-  assert.match(sheet, /role="dialog"/);
-  assert.match(sheet, /onPointerDown/);
-  assert.match(sheet, /aria-modal="true"/);
-  assert.match(css, /\.ios-sheet[^}]*background:\s*var\(--surface\)/s);
+test("Liquid Glass primitives cover controls and sheet", async () => {
+  const [app, main] = await Promise.all([read("src/App.tsx"), read("src/main.tsx")]);
+  for (const component of ["GlassButton", "GlassCard", "GlassInput", "GlassNav", "GlassSegmented", "GlassSheet", "GlassSwitch"]) assert.match(app, new RegExp(component));
+  assert.match(main, /@zakisheriff\/liquid-glass\/styles\.css/);
+});
+
+test("PWA configuration supports installation and offline navigation", async () => {
+  const [config, main, html] = await Promise.all([read("vite.config.ts"), read("src/main.tsx"), read("index.html")]);
+  assert.match(config, /VitePWA/);
+  assert.match(config, /display: 'standalone'/);
+  assert.match(config, /navigateFallback: '\/index\.html'/);
+  assert.match(main, /registerSW/);
+  assert.match(html, /apple-touch-icon/);
+  await Promise.all(["public/app-icon.svg", "public/pwa-192x192.png", "public/pwa-512x512.png", "public/pwa-maskable-512x512.png"].map((path) => access(new URL(`../${path}`, import.meta.url))));
 });
 
 test("design skill protects touch size and reduced motion", async () => {

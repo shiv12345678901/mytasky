@@ -8,7 +8,7 @@
 
 ## Sheets and confirmations
 
-- Creation, compact choices, and confirmations use a bottom sheet rather than a centered modal.
+- Creation, compact choices, and confirmations use the shared `GlassSheet` rather than a centered modal.
 - The sheet must be opaque, safe-area-aware, keyboard accessible, and dismissible by the grabber, backdrop, Escape key, and explicit Cancel action.
 - Destructive choices name their consequence and never rely on a vague “OK”.
 
